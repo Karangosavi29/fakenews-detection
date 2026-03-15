@@ -1,9 +1,14 @@
-# Ignore pkl only in ml-model folder
+# CSV and TSV - large dataset files
 ml-model/Fake.csv
 ml-model/True.csv
 ml-model/train.tsv
 ml-model/test.tsv
 ml-model/valid.tsv
+ml-model/custom_news.csv
+
+# pkl only in ml-model (NOT backend)
+ml-model/model.pkl
+ml-model/vectorizer.pkl
 
 # Node
 frontend/node_modules/
