@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import './App.css';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 const EXAMPLES = [
   "Obama secretly funded terrorist organizations using taxpayer money",
   "Senate passes new healthcare bill with bipartisan support in Congress",
   "5G towers are government mind control devices installed by billionaires",
-  "Study finds daily walking significantly reduces risk of heart disease",
+  "Reuters: Federal Reserve raises interest rates by 25 basis points today",
 ];
+
 function App() {
   const [text, setText] = useState('');
   const [result, setResult] = useState(null);
@@ -21,16 +24,10 @@ function App() {
     setError('');
 
     try {
-      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-
-
-      
-   const response = await fetch(`${API_URL}/predict`, {
-
-REACT_APP_API_URL = https://your-backend-url.com
+      const response = await fetch(API_URL + '/predict', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text: text }),
       });
 
       if (!response.ok) throw new Error('Server error');
@@ -39,26 +36,25 @@ REACT_APP_API_URL = https://your-backend-url.com
       setResult(data);
 
     } catch (err) {
-      setError('❌ Could not connect to server. Make sure backend is running!');
+      setError('Could not connect to server. Make sure backend is running!');
     }
 
     setLoading(false);
   };
 
-  // Color config based on verdict
   const getConfig = (verdict) => {
     if (verdict === 'FAKE') return {
       color: '#ff2d55',
       bg: 'rgba(255,45,85,0.12)',
       border: '2px solid #ff2d55',
-      icon: '✗',
+      icon: 'X',
       label: 'FAKE NEWS',
     };
     return {
       color: '#00e5a0',
       bg: 'rgba(0,229,160,0.1)',
       border: '2px solid #00e5a0',
-      icon: '✓',
+      icon: 'OK',
       label: 'CREDIBLE NEWS',
     };
   };
@@ -68,7 +64,6 @@ REACT_APP_API_URL = https://your-backend-url.com
   return (
     <div className="app">
 
-      {/* Header */}
       <div className="header">
         <h1>VERITY</h1>
         <p>AI-POWERED FAKE NEWS DETECTOR</p>
@@ -78,7 +73,6 @@ REACT_APP_API_URL = https://your-backend-url.com
         </div>
       </div>
 
-      {/* Input Panel */}
       <div className="panel">
         <div className="panel-title">INPUT NEWS TEXT</div>
 
@@ -89,7 +83,6 @@ REACT_APP_API_URL = https://your-backend-url.com
           placeholder="Paste a news headline or article text here..."
         />
 
-        {/* Example buttons */}
         <div style={{ marginTop: 10 }}>
           <div style={{ fontSize: 10, letterSpacing: 2, color: 'rgba(200,216,232,0.35)', marginBottom: 8 }}>
             TRY EXAMPLES:
@@ -112,11 +105,10 @@ REACT_APP_API_URL = https://your-backend-url.com
           onClick={analyze}
           disabled={!text.trim() || loading}
         >
-          {loading ? '⏳ ANALYZING...' : '▶  ANALYZE NEWS'}
+          {loading ? 'ANALYZING...' : 'ANALYZE NEWS'}
         </button>
       </div>
 
-      {/* Error */}
       {error && (
         <div style={{
           background: 'rgba(255,45,85,0.1)',
@@ -132,11 +124,10 @@ REACT_APP_API_URL = https://your-backend-url.com
         </div>
       )}
 
-      {/* Loading */}
       {loading && (
         <div className="panel loading">
           <div className="loading-text">
-            ◉ SCANNING TEXT...<br /><br />
+            SCANNING TEXT...<br /><br />
             ANALYZING PATTERNS<br />
             CHECKING CREDIBILITY<br />
             RUNNING ML MODEL
@@ -144,21 +135,17 @@ REACT_APP_API_URL = https://your-backend-url.com
         </div>
       )}
 
-      {/* Empty State */}
       {!loading && !result && !error && (
         <div className="panel empty">
-          ◎<br /><br />
-          AWAITING INPUT<br />
+          AWAITING INPUT<br /><br />
           Paste news text above and click ANALYZE
         </div>
       )}
 
-      {/* Result */}
       {!loading && result && cfg && (
         <div className="panel" style={{ border: cfg.border }}>
           <div className="panel-title">ANALYSIS RESULT</div>
 
-          {/* Verdict Badge */}
           <div className="verdict-badge" style={{
             background: cfg.bg,
             border: cfg.border,
@@ -171,7 +158,6 @@ REACT_APP_API_URL = https://your-backend-url.com
             </span>
           </div>
 
-          {/* Confidence */}
           <div className="conf-row">
             <span style={{ color: 'rgba(200,216,232,0.4)' }}>CONFIDENCE SCORE</span>
             <span style={{ color: cfg.color, fontWeight: 900 }}>
@@ -182,14 +168,13 @@ REACT_APP_API_URL = https://your-backend-url.com
             <div
               className="conf-bar"
               style={{
-                width: `${result.confidence}%`,
+                width: result.confidence + '%',
                 background: cfg.color,
-                boxShadow: `0 0 10px ${cfg.color}`,
+                boxShadow: '0 0 10px ' + cfg.color,
               }}
             />
           </div>
 
-          {/* Summary */}
           <div className="summary">
             This article was classified as <strong style={{ color: cfg.color }}>
               {result.verdict}
@@ -197,48 +182,50 @@ REACT_APP_API_URL = https://your-backend-url.com
             by the trained ML model.
           </div>
 
-          {/* Verdict Details */}
           {result.verdict === 'FAKE' && (
-            <>
+            <div>
               <div className="flags-title" style={{ color: '#ff2d55' }}>
-                ⚠ WHY IT MAY BE FAKE
+                WARNING: WHY IT MAY BE FAKE
               </div>
-              {[
-                'Sensational or exaggerated language detected',
-                'Claims may lack verifiable sources',
-                'Pattern matches known fake news articles',
-              ].map((f, i) => (
-                <div key={i} className="flag-item">
-                  <span className="flag-dot" style={{ background: '#ff2d55' }} />
-                  {f}
-                </div>
-              ))}
-            </>
+              <div className="flag-item">
+                <span className="flag-dot" style={{ background: '#ff2d55' }} />
+                Sensational or exaggerated language detected
+              </div>
+              <div className="flag-item">
+                <span className="flag-dot" style={{ background: '#ff2d55' }} />
+                Claims may lack verifiable sources
+              </div>
+              <div className="flag-item">
+                <span className="flag-dot" style={{ background: '#ff2d55' }} />
+                Pattern matches known fake news articles
+              </div>
+            </div>
           )}
 
           {result.verdict === 'REAL' && (
-            <>
+            <div>
               <div className="flags-title" style={{ color: '#00e5a0' }}>
-                ✓ CREDIBILITY INDICATORS
+                CREDIBILITY INDICATORS
               </div>
-              {[
-                'Neutral and factual language patterns',
-                'Writing style matches credible news sources',
-                'No sensationalist patterns detected',
-              ].map((f, i) => (
-                <div key={i} className="flag-item">
-                  <span className="flag-dot" style={{ background: '#00e5a0' }} />
-                  {f}
-                </div>
-              ))}
-            </>
+              <div className="flag-item">
+                <span className="flag-dot" style={{ background: '#00e5a0' }} />
+                Neutral and factual language patterns
+              </div>
+              <div className="flag-item">
+                <span className="flag-dot" style={{ background: '#00e5a0' }} />
+                Writing style matches credible news sources
+              </div>
+              <div className="flag-item">
+                <span className="flag-dot" style={{ background: '#00e5a0' }} />
+                No sensationalist patterns detected
+              </div>
+            </div>
           )}
         </div>
       )}
 
-      {/* Footer */}
       <div className="footer">
-        VERITY v1.0 — Always verify news with trusted sources
+        VERITY v1.0 - Always verify news with trusted sources
       </div>
 
     </div>
