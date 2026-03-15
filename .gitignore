@@ -1,24 +1,20 @@
-# Large ML files
-*.pkl
-*.csv
-*.tsv
-
-# Python
-__pycache__/
-*.pyc
+# Ignore pkl only in ml-model folder
+ml-model/Fake.csv
+ml-model/True.csv
+ml-model/train.tsv
+ml-model/test.tsv
+ml-model/valid.tsv
 
 # Node
-node_modules/
 frontend/node_modules/
 backend/node_modules/
 
 # React
 frontend/build/
-build/
+
+# Python cache
+__pycache__/
+*.pyc
 
 # Vercel
 .vercel
-
-# Environment
-.env
-.env.local
